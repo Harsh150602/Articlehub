@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8" />
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0"/>
+
+  <title>Firm Profile</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:Arial,sans-serif;
+    }
+
+    body{
+      background:#f5f7fb;
+      color:#1f2937;
+    }
+
+    .container{
+
+      width:90%;
+      max-width:900px;
+
+      margin:40px auto;
+    }
+
+    .profile-card{
+
+      background:white;
+
+      padding:30px;
+
+      border-radius:20px;
+
+      box-shadow:
+        0 5px 20px rgba(0,0,0,0.08);
+    }
+
+    .firm-name{
+
+      font-size:38px;
+
+      font-weight:bold;
+
+      margin-bottom:10px;
+
+      color:#2563eb;
+    }
+
+    .overall-rating{
+
+      font-size:26px;
+
+      margin-top:10px;
+
+      color:#f59e0b;
+    }
+
+    .city{
+
+      margin-top:15px;
+
+      color:#6b7280;
+
+      font-size:18px;
+    }
+
+    .section-title{
+
+      margin-top:35px;
+
+      margin-bottom:20px;
+
+      font-size:28px;
+
+      color:#111827;
+    }
+
+    .rating-box{
+
+      display:flex;
+
+      justify-content:space-between;
+
+      align-items:center;
+
+      background:#f9fafb;
+
+      padding:15px 20px;
+
+      border-radius:12px;
+
+      margin-top:12px;
+    }
+
+    .rating-label{
+
+      font-size:18px;
+
+      font-weight:500;
+    }
+
+    .rating-value{
+
+      font-size:20px;
+
+      color:#f59e0b;
+
+      font-weight:bold;
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <div class="container">
+
+    <div class="profile-card">
+
+      <div
+        class="firm-name"
+        id="firmName">
+      </div>
+
+      <div
+        class="overall-rating"
+        id="overallRating">
+      </div>
+
+      <div
+        class="city"
+        id="firmCity">
+      </div>
+
+      <!-- CULTURE SECTION -->
+      <h2 class="section-title">
+        Workplace Ratings
+      </h2>
+
+      <div class="rating-box">
+
+        <div class="rating-label">
+          📚 Learning Exposure
+        </div>
+
+        <div
+          class="rating-value"
+          id="learning">
+        </div>
+
+      </div>
+
+      <div class="rating-box">
+
+        <div class="rating-label">
+          🏢 Work Culture
+        </div>
+
+        <div
+          class="rating-value"
+          id="workCulture">
+        </div>
+
+      </div>
+
+      <div class="rating-box">
+
+        <div class="rating-label">
+          ⚖️ Work-Life Balance
+        </div>
+
+        <div
+          class="rating-value"
+          id="workLife">
+        </div>
+
+      </div>
+
+      <!-- ACTIVITY SECTION -->
+      <h2 class="section-title">
+        Activity Exposure
+      </h2>
+
+      <div class="rating-box">
+
+        <div class="rating-label">
+          📑 Statutory Audit
+        </div>
+
+        <div
+          class="rating-value"
+          id="statutoryAudit">
+        </div>
+
+      </div>
+
+      <div class="rating-box">
+
+        <div class="rating-label">
+          📊 Internal Audit
+        </div>
+
+        <div
+          class="rating-value"
+          id="internalAudit">
+        </div>
+
+      </div>
+
+      <div class="rating-box">
+
+        <div class="rating-label">
+          💰 Tax Audit
+        </div>
+
+        <div
+          class="rating-value"
+          id="taxAudit">
+        </div>
+
+      </div>
+
+      <div class="rating-box">
+
+        <div class="rating-label">
+          📝 Regulatory Filings
+        </div>
+
+        <div
+          class="rating-value"
+          id="regulatoryFilings">
+        </div>
+
+      </div>
+
+      <div class="rating-box">
+
+        <div class="rating-label">
+          🔍 Due Diligence
+        </div>
+
+        <div
+          class="rating-value"
+          id="dueDiligence">
+        </div>
+
+      </div>
+
+      <div class="rating-box">
+
+        <div class="rating-label">
+          🚀 Skill Building
+        </div>
+
+        <div
+          class="rating-value"
+          id="skillBuilding">
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+
+    // SUPABASE
+    const supabaseUrl =
+      'https://xepbewcvbtcabwvgfxcj.supabase.co';
+
+    const supabaseKey =
+      'sb_publishable_7pOY59ShVNaBeucS4FaV2w_IAFvMqJZ';
+
+    const supabaseClient =
+      window.supabase.createClient(
+        supabaseUrl,
+        supabaseKey
+      );
+
+    // GET URL PARAMETER
+    const params =
+      new URLSearchParams(
+        window.location.search
+      );
+
+    const firmId =
+      params.get('id');
+
+    // LOAD FIRM PROFILE
+    async function loadFirm(){
+
+      const { data, error } =
+        await supabaseClient
+          .from('Firms')
+          .select('*')
+          .eq('id', firmId)
+          .single();
+
+      if(error){
+
+        console.log(error);
+
+        return;
+      }
+
+      // BASIC INFO
+      document.getElementById(
+        'firmName'
+      ).innerText =
+        data.name;
+
+      document.getElementById(
+        'overallRating'
+      ).innerText =
+        `⭐ Overall Rating: ${
+          Number(data.rating || 0)
+          .toFixed(1)
+        }`;
+
+      document.getElementById(
+        'firmCity'
+      ).innerText =
+        `📍 ${data.city}`;
+
+      // WORKPLACE RATINGS
+      document.getElementById(
+        'learning'
+      ).innerText =
+        `⭐ ${
+          Number(data.learning || 0)
+          .toFixed(1)
+        }`;
+
+      document.getElementById(
+        'workCulture'
+      ).innerText =
+        `⭐ ${
+          Number(data.work_culture || 0)
+          .toFixed(1)
+        }`;
+
+      document.getElementById(
+        'workLife'
+      ).innerText =
+        `⭐ ${
+          Number(data.work_life_balance || 0)
+          .toFixed(1)
+        }`;
+
+      // ACTIVITY RATINGS
+      document.getElementById(
+        'statutoryAudit'
+      ).innerText =
+        `⭐ ${
+          Number(data.statutory_audit || 0)
+          .toFixed(1)
+        }`;
+
+      document.getElementById(
+        'internalAudit'
+      ).innerText =
+        `⭐ ${
+          Number(data.internal_audit || 0)
+          .toFixed(1)
+        }`;
+
+      document.getElementById(
+        'taxAudit'
+      ).innerText =
+        `⭐ ${
+          Number(data.tax_audit || 0)
+          .toFixed(1)
+        }`;
+
+      document.getElementById(
+        'regulatoryFilings'
+      ).innerText =
+        `⭐ ${
+          Number(data.regulatory_filings || 0)
+          .toFixed(1)
+        }`;
+
+      document.getElementById(
+        'dueDiligence'
+      ).innerText =
+        `⭐ ${
+          Number(data.due_diligence || 0)
+          .toFixed(1)
+        }`;
+
+      document.getElementById(
+        'skillBuilding'
+      ).innerText =
+        `⭐ ${
+          Number(data.skill_building || 0)
+          .toFixed(1)
+        }`;
+    }
+
+    loadFirm();
+
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8" />
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0"/>
+
+  <title>ArticleHub Kolkata</title>
+
+  <!-- SUPABASE -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:Arial,sans-serif;
+    }
+
+    body{
+      background:#f5f7fb;
+      color:#1f2937;
+    }
+
+    nav{
+
+      background:white;
+
+      padding:15px 40px;
+
+      display:flex;
+
+      justify-content:space-between;
+      align-items:center;
+
+      box-shadow:
+        0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .logo{
+
+      font-size:24px;
+      font-weight:bold;
+
+      color:#2563eb;
+    }
+
+    .hero{
+
+      background:
+      linear-gradient(
+        135deg,
+        #1e40af,
+        #2563eb
+      );
+
+      color:white;
+
+      text-align:center;
+
+      padding:80px 20px;
+    }
+
+    .hero h1{
+
+      font-size:48px;
+
+      margin-bottom:20px;
+    }
+
+    .hero p{
+
+      max-width:700px;
+
+      margin:auto;
+
+      font-size:18px;
+    }
+
+    .search-box{
+
+      margin-top:30px;
+    }
+
+    .search-box input{
+
+      width:60%;
+      max-width:500px;
+
+      padding:15px;
+
+      border:none;
+
+      border-radius:10px;
+
+      font-size:16px;
+    }
+
+    .container{
+
+      width:90%;
+      max-width:1200px;
+
+      margin:40px auto;
+    }
+
+    .section-title{
+
+      font-size:30px;
+
+      margin-bottom:20px;
+    }
+
+    .stats-box{
+
+      background:white;
+
+      padding:20px;
+
+      border-radius:15px;
+
+      margin-bottom:25px;
+
+      box-shadow:
+        0 5px 20px rgba(0,0,0,0.05);
+
+      text-align:center;
+    }
+
+    .stats-box h3{
+
+      font-size:28px;
+
+      color:#2563eb;
+    }
+
+    .firm-grid{
+
+      display:grid;
+
+      grid-template-columns:
+      repeat(auto-fit,minmax(300px,1fr));
+
+      gap:20px;
+    }
+
+    .firm-card{
+
+      background:white;
+
+      padding:20px;
+
+      border-radius:15px;
+
+      box-shadow:
+        0 5px 20px rgba(0,0,0,0.05);
+
+      transition:0.3s ease;
+
+      cursor:pointer;
+    }
+
+    .firm-card:hover{
+
+      transform:translateY(-8px);
+
+      box-shadow:
+        0 15px 30px rgba(0,0,0,0.12);
+    }
+
+    .firm-name{
+
+      font-size:22px;
+
+      font-weight:bold;
+
+      margin-bottom:10px;
+
+      overflow:hidden;
+
+      text-overflow:ellipsis;
+
+      white-space:nowrap;
+    }
+
+    .rating{
+
+      font-size:20px;
+
+      margin-bottom:10px;
+    }
+
+    .good-rating{
+      color:#16a34a;
+    }
+
+    .average-rating{
+      color:#f59e0b;
+    }
+
+    .bad-rating{
+      color:#dc2626;
+    }
+
+    .review-box{
+
+      background:white;
+
+      padding:20px;
+
+      border-radius:15px;
+
+      margin-top:40px;
+
+      box-shadow:
+        0 5px 20px rgba(0,0,0,0.05);
+    }
+
+    input,
+    select,
+    button{
+
+      width:100%;
+
+      padding:12px;
+
+      border-radius:10px;
+
+      margin-top:10px;
+
+      font-size:16px;
+    }
+
+    button{
+
+      background:#2563eb;
+
+      color:white;
+
+      border:none;
+
+      cursor:pointer;
+    }
+
+    button:hover{
+
+      background:#1d4ed8;
+    }
+
+    footer{
+
+      background:white;
+
+      text-align:center;
+
+      padding:30px;
+
+      margin-top:50px;
+
+      color:#6b7280;
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <!-- NAVBAR -->
+  <nav>
+
+  <div class="logo">
+    ArticleHub Kolkata
+  </div>
+
+  <div style="
+    display:flex;
+    gap:15px;
+    align-items:center;
+  ">
+
+   
+
+    <button
+      onclick="logout()"
+      style="
+        width:auto;
+        padding:10px 18px;
+      "
+    >
+      Logout
+    </button>
+
+  </div>
+
+</nav>
+
+  <!-- HERO -->
+  <section class="hero">
+
+    <h1>
+      Find the Right CA Firm
+    </h1>
+
+    <p>
+      Explore verified ratings of CA firms before choosing your articleship.
+    </p>
+
+    <div class="search-box">
+
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="Search firms..."
+      />
+
+    </div>
+
+  </section>
+
+  <!-- MAIN -->
+  <div class="container">
+
+    <h2 class="section-title">
+      Top Rated Firms
+    </h2>
+
+    <!-- TOTAL FIRMS -->
+    <div class="stats-box">
+
+      <h3 id="totalFirms">
+        Total Firms Listed: 0
+      </h3>
+
+    </div>
+
+    <!-- FIRM CARDS -->
+    <div
+      class="firm-grid"
+      id="firmGrid">
+    </div>
+
+    <!-- REVIEW BOX -->
+    <div class="review-box">
+
+      <h3>
+        Your Firm
+      </h3>
+
+      <input
+        type="text"
+        id="userFirm"
+        disabled
+      />
+
+      <h3 style="margin-top:20px;">
+        Give Rating
+      </h3>
+
+     <h3 style="margin-top:20px;">
+  Learning Exposure
+</h3>
+
+<select id="learning">
+
+  <option value="5">5 Stars</option>
+  <option value="4">4 Stars</option>
+  <option value="3">3 Stars</option>
+  <option value="2">2 Stars</option>
+  <option value="1">1 Star</option>
+
+</select>
+
+<h3 style="margin-top:20px;">
+  Work Culture
+</h3>
+
+<select id="workCulture">
+
+  <option value="5">5 Stars</option>
+  <option value="4">4 Stars</option>
+  <option value="3">3 Stars</option>
+  <option value="2">2 Stars</option>
+  <option value="1">1 Star</option>
+
+</select>
+
+<h3 style="margin-top:20px;">
+  Work-Life Balance
+</h3>
+
+<select id="workLife">
+
+  <option value="5">5 Stars</option>
+  <option value="4">4 Stars</option>
+  <option value="3">3 Stars</option>
+  <option value="2">2 Stars</option>
+  <option value="1">1 Star</option>
+
+</select>
+
+<h3 style="margin-top:20px;">
+  Statutory Audit
+</h3>
+
+<select id="statutoryAudit">
+
+  <option value="5">5 Stars</option>
+  <option value="4">4 Stars</option>
+  <option value="3">3 Stars</option>
+  <option value="2">2 Stars</option>
+  <option value="1">1 Star</option>
+
+</select>
+
+<h3 style="margin-top:20px;">
+  Internal Audit
+</h3>
+
+<select id="internalAudit">
+
+  <option value="5">5 Stars</option>
+  <option value="4">4 Stars</option>
+  <option value="3">3 Stars</option>
+  <option value="2">2 Stars</option>
+  <option value="1">1 Star</option>
+
+</select>
+
+<h3 style="margin-top:20px;">
+  Tax Audit
+</h3>
+
+<select id="taxAudit">
+
+  <option value="5">5 Stars</option>
+  <option value="4">4 Stars</option>
+  <option value="3">3 Stars</option>
+  <option value="2">2 Stars</option>
+  <option value="1">1 Star</option>
+
+</select>
+
+<h3 style="margin-top:20px;">
+  Regulatory Filings
+</h3>
+
+<select id="regulatoryFilings">
+
+  <option value="5">5 Stars</option>
+  <option value="4">4 Stars</option>
+  <option value="3">3 Stars</option>
+  <option value="2">2 Stars</option>
+  <option value="1">1 Star</option>
+
+</select>
+
+<h3 style="margin-top:20px;">
+  Due Diligence
+</h3>
+
+<select id="dueDiligence">
+
+  <option value="5">5 Stars</option>
+  <option value="4">4 Stars</option>
+  <option value="3">3 Stars</option>
+  <option value="2">2 Stars</option>
+  <option value="1">1 Star</option>
+
+</select>
+
+<h3 style="margin-top:20px;">
+  Skill Building
+</h3>
+
+<select id="skillBuilding">
+
+  <option value="5">5 Stars</option>
+  <option value="4">4 Stars</option>
+  <option value="3">3 Stars</option>
+  <option value="2">2 Stars</option>
+  <option value="1">1 Star</option>
+
+</select>
+
+      <button onclick="submitReview()">
+        Submit Rating
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    © 2026 ArticleHub Kolkata
+  </footer>
+
+  <script>
+
+    // SUPABASE CONFIG
+    const supabaseUrl =
+      'https://xepbewcvbtcabwvgfxcj.supabase.co';
+
+    const supabaseKey =
+      'sb_publishable_7pOY59ShVNaBeucS4FaV2w_IAFvMqJZ';
+
+    const supabaseClient =
+      window.supabase.createClient(
+        supabaseUrl,
+        supabaseKey
+      );
+
+    // GLOBAL VARIABLES
+    let firms = [];
+
+    let currentUserFirm = '';
+
+    // HTML ELEMENTS
+    const firmGrid =
+      document.getElementById('firmGrid');
+
+    const searchInput =
+      document.getElementById('searchInput');
+
+    // LOAD CURRENT USER
+    async function loadCurrentUser(){
+
+      // GET LOGGED IN USER
+      const {
+        data: { user }
+      } =
+      await supabaseClient.auth.getUser();
+
+      // IF NOT LOGGED IN
+      if(!user){
+
+        window.location.href =
+          'login.html';
+
+        return;
+      }
+
+      // GET USER PROFILE
+      const { data, error } =
+        await supabaseClient
+          .from('users')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+
+      if(error){
+
+        console.log(error);
+
+        return;
+      }
+
+      currentUserFirm =
+        data.assigned_firm;
+
+      // SHOW USER FIRM
+      document.getElementById(
+        'userFirm'
+      ).value =
+        currentUserFirm;
+    }
+
+    // LOAD FIRMS
+    async function loadFirms(){
+
+      const { data, error } =
+        await supabaseClient
+          .from('Firms')
+          .select('*')
+          .range(0, 5000);
+
+      if(error){
+
+        console.log(error);
+
+        alert(
+          'Database Error: ' +
+          error.message
+        );
+
+        return;
+      }
+
+      firms = data;
+
+      // TOTAL COUNT
+      document.getElementById(
+        'totalFirms'
+      ).innerText =
+        `Total Firms Listed: ${firms.length}`;
+
+      displayFirms(firms);
+    }
+
+    // DISPLAY FIRMS
+    function displayFirms(data){
+
+      firmGrid.innerHTML = '';
+
+      data
+        .sort((a,b) =>
+          (b.rating || 0) -
+          (a.rating || 0)
+        )
+        .slice(0, 5)
+        .forEach(firm => {
+
+          const card =
+            document.createElement('div');
+            card.onclick = function(){
+
+             window.location.href =
+           `firm.html?id=${firm.id}`;
+}
+
+          card.classList.add('firm-card');
+
+         card.innerHTML = `
+
+  <div class="firm-name">
+    ${firm.name}
+  </div>
+
+  <div class="
+    rating
+    ${
+      (firm.rating || 0) >= 4
+      ? 'good-rating'
+      : (firm.rating || 0) >= 2.5
+      ? 'average-rating'
+      : 'bad-rating'
+    }
+  ">
+    ⭐ Overall:
+    ${Number(firm.rating || 0).toFixed(1)}
+  </div>
+
+  <p style="
+    margin-top:10px;
+    font-size:15px;
+  ">
+    📚 Learning Exposure:
+    <strong>
+      ${Number(firm.learning || 0).toFixed(1)}
+    </strong>
+  </p>
+
+  <p style="
+    margin-top:8px;
+    font-size:15px;
+  ">
+    🏢 Work Culture:
+    <strong>
+      ${Number(firm.work_culture || 0).toFixed(1)}
+    </strong>
+  </p>
+
+  <p style="
+    margin-top:8px;
+    font-size:15px;
+  ">
+    ⚖️ Work-Life Balance:
+    <strong>
+      ${Number(firm.work_life_balance || 0).toFixed(1)}
+    </strong>
+  </p>
+
+  <p style="
+    margin-top:12px;
+    color:#6b7280;
+  ">
+    📍 ${firm.city}
+  </p>
+
+`;
+          firmGrid.appendChild(card);
+      });
+    }
+
+    // SEARCH
+    searchInput.addEventListener(
+      'input',
+      function(){
+
+        const value =
+          this.value.toLowerCase();
+
+        const filtered =
+          firms.filter(firm =>
+            firm.name
+              .toLowerCase()
+              .includes(value)
+          );
+
+        displayFirms(filtered);
+      }
+    );
+
+   // SUBMIT REVIEW
+async function submitReview(){
+
+  // FIND USER FIRM
+  const firm =
+    firms.find(
+      f => f.name === currentUserFirm
+    );
+
+  const firmId = firm.id;
+
+  // GET CATEGORY RATINGS
+  const learning =
+    Number(
+      document.getElementById(
+        'learning'
+      ).value
+    );
+
+  const workCulture =
+    Number(
+      document.getElementById(
+        'workCulture'
+      ).value
+    );
+
+  const workLife =
+    Number(
+      document.getElementById(
+        'workLife'
+      ).value
+    );
+const statutoryAudit =
+  Number(
+    document.getElementById(
+      'statutoryAudit'
+    ).value
+  );
+
+const internalAudit =
+  Number(
+    document.getElementById(
+      'internalAudit'
+    ).value
+  );
+
+const taxAudit =
+  Number(
+    document.getElementById(
+      'taxAudit'
+    ).value
+  );
+
+const regulatoryFilings =
+  Number(
+    document.getElementById(
+      'regulatoryFilings'
+    ).value
+  );
+
+const dueDiligence =
+  Number(
+    document.getElementById(
+      'dueDiligence'
+    ).value
+  );
+
+const skillBuilding =
+  Number(
+    document.getElementById(
+      'skillBuilding'
+    ).value
+  );
+
+  // CALCULATE OVERALL RATING
+  const overallRating =
+    (
+      learning +
+      workCulture +
+      workLife
+    ) / 3;
+
+  // CHECK IF ALREADY RATED
+  const alreadyRated =
+    localStorage.getItem(
+      `rated_${firmId}`
+    );
+
+  if(alreadyRated){
+
+    alert(
+      'You already rated your firm.'
+    );
+
+    return;
+  }
+
+  // UPDATE DATABASE
+  const { error } =
+    await supabaseClient
+      .from('Firms')
+      .update({
+
+        rating: overallRating,
+
+learning: learning,
+
+work_culture: workCulture,
+
+work_life_balance: workLife,
+
+statutory_audit:
+  statutoryAudit,
+
+internal_audit:
+  internalAudit,
+
+tax_audit:
+  taxAudit,
+
+regulatory_filings:
+  regulatoryFilings,
+
+due_diligence:
+  dueDiligence,
+
+skill_building:
+  skillBuilding
+      })
+      .eq('id', firmId);
+
+  if(error){
+
+    console.log(error);
+
+    alert(
+      'Error: ' +
+      error.message
+    );
+
+    return;
+  }
+
+  // SAVE LOCAL RATING
+  localStorage.setItem(
+    `rated_${firmId}`,
+    true
+  );
+
+  alert(
+    'Rating Submitted Successfully!'
+  );
+
+  loadFirms();
+}
+
+
+    // INITIAL LOAD
+    loadCurrentUser();
+    // LOGOUT
+async function logout(){
+
+  await supabaseClient
+    .auth
+    .signOut();
+
+  window.location.href =
+    'login.html';
+}
+
+    loadFirms();
+
+  </script>
+
+</body>
+
+</html>

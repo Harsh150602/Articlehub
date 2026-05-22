@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0"/>
+
+  <title>Signup - ArticleHub</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:Arial,sans-serif;
+    }
+
+    body{
+
+      background:#f5f7fb;
+
+      display:flex;
+      justify-content:center;
+      align-items:center;
+
+      height:100vh;
+    }
+
+    .signup-box{
+
+      background:white;
+
+      width:400px;
+
+      padding:30px;
+
+      border-radius:15px;
+
+      box-shadow:
+        0 5px 20px rgba(0,0,0,0.1);
+    }
+
+    h1{
+
+      text-align:center;
+
+      margin-bottom:25px;
+
+      color:#2563eb;
+    }
+
+    input,
+    select,
+    button{
+
+      width:100%;
+
+      padding:12px;
+
+      margin-top:12px;
+
+      border-radius:10px;
+
+      border:1px solid #d1d5db;
+
+      font-size:16px;
+    }
+
+    button{
+
+      background:#2563eb;
+
+      color:white;
+
+      border:none;
+
+      cursor:pointer;
+    }
+
+    button:hover{
+
+      background:#1d4ed8;
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <div class="signup-box">
+
+    <h1>
+      Create Account
+    </h1>
+
+    <input
+      type="text"
+      id="name"
+      placeholder="Full Name"
+    />
+
+    <input
+      type="email"
+      id="email"
+      placeholder="Email"
+    />
+
+    <input
+      type="text"
+      id="regno"
+      placeholder="ICAI Registration Number"
+    />
+
+    <select id="firmSelect"></select>
+
+    <input
+      type="password"
+      id="password"
+      placeholder="Password"
+    />
+
+    <button onclick="signup()">
+      Signup
+    </button>
+
+  </div>
+
+  <script>
+
+    // SUPABASE
+    const supabaseUrl =
+      'https://xepbewcvbtcabwvgfxcj.supabase.co';
+
+    const supabaseKey =
+      'sb_publishable_7pOY59ShVNaBeucS4FaV2w_IAFvMqJZ';
+
+    const supabaseClient =
+      window.supabase.createClient(
+        supabaseUrl,
+        supabaseKey
+      );
+
+    // LOAD FIRMS
+    async function loadFirms(){
+
+      const { data, error } =
+        await supabaseClient
+          .from('Firms')
+          .select('*');
+
+      if(error){
+
+        console.log(error);
+
+        return;
+      }
+
+      const dropdown =
+        document.getElementById('firmSelect');
+
+      data.forEach(firm => {
+
+        const option =
+          document.createElement('option');
+
+        option.value = firm.name;
+
+        option.textContent = firm.name;
+
+        dropdown.appendChild(option);
+      });
+    }
+
+    loadFirms();
+
+    // SIGNUP
+    async function signup(){
+
+      const name =
+        document.getElementById('name').value;
+
+      const email =
+        document.getElementById('email').value;
+
+      const regno =
+        document.getElementById('regno').value;
+
+      const assignedFirm =
+        document.getElementById('firmSelect').value;
+
+      const password =
+        document.getElementById('password').value;
+
+      // CREATE AUTH USER
+      const {
+        data,
+        error
+      } =
+      await supabaseClient.auth.signUp({
+
+        email: email,
+        password: password
+      });
+
+      if(error){
+
+        alert(error.message);
+
+        return;
+      }
+
+      const user =
+        data.user;
+
+      // INSERT USER PROFILE
+      const { error: profileError } =
+        await supabaseClient
+          .from('users')
+          .insert([
+            {
+              id: user.id,
+              name: name,
+              email: email,
+              reg_no: regno,
+              assigned_firm: assignedFirm
+            }
+          ]);
+
+      if(profileError){
+
+        alert(profileError.message);
+
+        return;
+      }
+
+      alert(
+        'Signup Successful!'
+      );
+
+      // REDIRECT
+      window.location.href =
+        'index.html';
+    }
+
+  </script>
+
+</body>
+
+</html>
