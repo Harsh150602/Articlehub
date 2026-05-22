@@ -200,6 +200,9 @@
 
     
        // SIGNUP
+
+    async function signup(){
+
 const button =
   document.getElementById(
     'signupBtn'
@@ -209,7 +212,6 @@ button.disabled = true;
 
 button.innerText =
   'Please Wait...';
-    async function signup(){
 
       const name =
         document.getElementById('name').value;
@@ -233,10 +235,15 @@ button.innerText =
   !password
 ){
 
-  alert(
-    'Please fill all fields.'
-  );
 
+alert(
+  'Please fill all fields.'
+);
+
+button.disabled = false;
+
+button.innerText =
+  'Signup';
   return;
 }
 
@@ -283,6 +290,11 @@ button.innerText =
       if(profileError){
 
         alert(profileError.message);
+        
+     button.disabled = false;
+
+button.innerText =
+  'Signup';
 
         return;
       }
