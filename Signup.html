@@ -156,10 +156,25 @@
 
       if(error){
 
-        console.log(error);
+  if(
+    error.message.includes(
+      'rate limit'
+    )
+  ){
 
-        return;
-      }
+    alert(
+      'Too many signup attempts. Please wait 1 minute and try again.'
+    );
+
+  }else{
+
+    alert(
+      error.message
+    );
+  }
+
+  return;
+}
 
       const dropdown =
         document.getElementById('firmSelect');
@@ -196,6 +211,20 @@
 
       const password =
         document.getElementById('password').value;
+    if(
+  !name ||
+  !email ||
+  !regno ||
+  !assignedFirm ||
+  !password
+){
+
+  alert(
+    'Please fill all fields.'
+  );
+
+  return;
+}
 
       // CREATE AUTH USER
       const {
@@ -239,13 +268,14 @@
         return;
       }
 
-      alert(
-        'Signup Successful!'
-      );
+     alert(
+  'Verification email sent. Please verify your email before login.'
+);
 
-      // REDIRECT
-      window.location.href =
-        'index.html';
+// REDIRECT
+window.location.href =
+  'login.html';
+
     }
 
   </script>
