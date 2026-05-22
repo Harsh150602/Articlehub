@@ -125,7 +125,11 @@
       placeholder="Password"
     />
 
-    <button onclick="signup()">
+    <button
+  type="button"
+  id="signupBtn"
+  onclick="signup()"
+>
       Signup
     </button>
 
@@ -194,7 +198,17 @@
 
     loadFirms();
 
-    // SIGNUP
+    
+       // SIGNUP
+const button =
+  document.getElementById(
+    'signupBtn'
+  );
+
+button.disabled = true;
+
+button.innerText =
+  'Please Wait...';
     async function signup(){
 
       const name =
@@ -239,7 +253,12 @@
 
       if(error){
 
+
         alert(error.message);
+button.disabled = false;
+
+button.innerText =
+  'Signup';
 
         return;
       }
